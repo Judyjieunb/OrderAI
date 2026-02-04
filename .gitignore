@@ -47,6 +47,7 @@ temp_charts/
 
 # Claude Code local settings
 .claude/
+!.claude/skills/
 
 # Generated output (파이프라인 결과물)
 output/

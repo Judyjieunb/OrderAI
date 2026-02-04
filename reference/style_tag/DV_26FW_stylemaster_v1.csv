@@ -1,0 +1,90 @@
+﻿style_id,style_name,season,gender,category,item,detail1,detail2,detail3,detail4,detail5,detail6,detail7,detail8,detail9,detail10,match_style_id,color_code,total_order_qty,total_order_tag
+VDDH30165,나스카라 N,26F,women,DOWN,,new,semi-shiny,TX1,short,,light,,800fp,diamond,,,CAS,150,148500000
+VDDH30165,나스카라 N,26F,women,DOWN,,new,semi-shiny,TX1,short,,light,,800fp,diamond,,,BKS,200,198000000
+VDDH30865,나스카라 N 벨벳,26F,women,DOWN,,new,semi-shiny,TX2,short,,light,,800fp,diamond,,,BKL,500,495000000
+VDDH11165,사다멜릭,26F,women,DOWN,,new,soft-matte,TX1,short,,light,,800fp,horizontal,,,CRS,150,148500000
+VDDH11165,사다멜릭,26F,women,DOWN,,new,soft-matte,TX1,short,,light,,800fp,horizontal,,,BLL,150,148500000
+VDDJ11565,퀼팅 숏 벨벳,26F,women,DOWN,,new,semi-shiny,TX2,short,,light,,700fp,diamond,,,BKL,300,267000000
+VDDJ11465,퀼팅 숏 오로라,26F,women,DOWN,,new,semi-shiny,TX2,short,,light,,700fp,diamond,,,WHL,250,222500000
+VDDJ31565,리아노리 미드,26F,women,DOWN,,carryover,semi-shiny,TX2,middle,,light,,800fp,nonquilting,,VDDJ31555,BGS,200,218000000
+VDDJ31565,리아노리 미드,26F,women,DOWN,,carryover,semi-shiny,TX2,middle,,light,,800fp,nonquilting,,VDDJ31555,BKS,500,545000000
+VDDJ31465,리아노리 미드,26F,women,DOWN,,carryover,semi-shiny,TX2,middle,,light,,800fp,nonquilting,,VDDJ31555,BRD,300,327000000
+VDDH30265,에우리피데,26F,women,DOWN,,carryover,semi-shiny,TX1,middle,,light,,800fp,diamond,,VDDH31255,IVD,200,218000000
+VDDH30265,에우리피데,26F,women,DOWN,,carryover,semi-shiny,TX1,middle,,light,,800fp,diamond,,VDDH31255,MTL,230,250700000
+VDDH30265,에우리피데,26F,women,DOWN,,carryover,semi-shiny,TX1,middle,,light,,800fp,diamond,,VDDH31255,CAS,400,436000000
+VDDH30265,에우리피데,26F,women,DOWN,,carryover,semi-shiny,TX1,middle,,light,,800fp,diamond,,VDDH31255,BKS,400,436000000
+VDDH30365,에우리피데 벨벳,26F,women,DOWN,,carryover,semi-shiny,TX2,middle,,light,,800fp,diamond,,VDDH36355,BKL,2000,2180000000
+VDDJ11765,퀼팅 미드,26F,women,DOWN,,new,semi-shiny,TX1,middle,,light,,800fp,modified,,,OLS,180,196200000
+VDDJ11765,퀼팅 미드,26F,women,DOWN,,new,semi-shiny,TX1,middle,,light,,800fp,modified,,,MTL,180,196200000
+VDDJ11765,퀼팅 미드,26F,women,DOWN,,new,semi-shiny,TX1,middle,,light,,800fp,modified,,,BKS,365,397850000
+VDDJ31365,리아노리,26F,women,DOWN,,carryover,semi-shiny,TX2,long,,light,,800fp,nonquilting,,VDDJ31355,BKS,200,258000000
+VDDJ31965,레지아 다운,26F,women,DOWN,,carryover,semi-shiny,TX2,long,,light,,800fp,nonquilting,,VDDJ31355,BGS,150,193500000
+VDDJ31965,레지아 다운,26F,women,DOWN,,carryover,semi-shiny,TX2,long,,light,,800fp,nonquilting,,VDDJ31355,BKS,350,451500000
+VDDH30465,나스카라 long,26F,women,DOWN,,new,semi-shiny,TX1,long,,light,,800fp,diamond,,,CAS,150,178500000
+VDDH30465,나스카라 long,26F,women,DOWN,,new,semi-shiny,TX1,long,,light,,800fp,diamond,,,OLS,150,178500000
+VDDJ36465,바를레타,26F,women,DOWN,,carryover,semi-shiny,TX1,short,,light,,800fp,diamond,,VDDJ36455,IVD,300,267000000
+VDDJ36465,바를레타,26F,women,DOWN,,carryover,semi-shiny,TX1,short,,light,,800fp,diamond,,VDDJ36455,MTL,150,133500000
+VDDJ36465,바를레타,26F,women,DOWN,,carryover,semi-shiny,TX1,short,,light,,800fp,diamond,,VDDJ36455,BKS,250,222500000
+VDDJ33965,체프라노 N,26F,women,DOWN,,new,semi-matte,TX1,short,,light,,700fp,horizontal,,,CRS,200,178000000
+VDDJ33965,체프라노 N,26F,women,DOWN,,new,semi-matte,TX1,short,,light,,700fp,horizontal,,,BKS,200,178000000
+VDDJ33865,아트라니,26F,women,DOWN,,carryover,soft-matte,TX1,short,,light,,800fp,square,,VDDJ11855,CRS,470,418300000
+VDDJ33865,아트라니,26F,women,DOWN,,carryover,soft-matte,TX1,short,,light,,800fp,square,,VDDJ11855,BRD,300,267000000
+VDDJ17365,부클카라,26F,women,DOWN,,new,soft-matte,TX1,short,,light,,800fp,square,,,CRS,320,348800000
+VDDJ12265,하이넥 경량,26F,women,DOWN,,new,semi-matte,TX1,short,,light,,800fp,horizontal,,,CAS,200,198000000
+VDDJ12265,하이넥 경량,26F,women,DOWN,,new,semi-matte,TX1,short,,light,,800fp,horizontal,,,BKS,250,247500000
+VDDJ35265,카일라 N 미드,26F,women,DOWN,,new,semi-matte,TX1,middle,,light,,800fp,diamond,,,CRS,200,218000000
+VDDJ35265,카일라 N 미드,26F,women,DOWN,,new,semi-matte,TX1,middle,,light,,800fp,diamond,,,BKS,300,327000000
+VDDJ35365,카일라 N,26F,women,DOWN,,new,semi-matte,TX1,long,,light,,800fp,diamond,,,BGS,150,178500000
+VDDJ35365,카일라 N,26F,women,DOWN,,new,semi-matte,TX1,long,,light,,800fp,diamond,,,BKS,250,297500000
+VDDJ15766,토리사,26F,women,DOWN,,new,semi-matte,TX1,short,,heavy,,800fp,horizontal,,,CAS,200,258000000
+VDDJ15766,토리사,26F,women,DOWN,,new,semi-matte,TX1,short,,heavy,,800fp,horizontal,,,BKS,300,387000000
+VDDJ15066,토리사 에덴,26F,women,DOWN,,new,semi-matte,TX1,short,,heavy,,800fp,horizontal,,,IVS,180,232200000
+VDDJ15066,토리사 에덴,26F,women,DOWN,,new,semi-matte,TX1,short,,heavy,,800fp,horizontal,,,BLS,180,232200000
+VDDJ15566,토리사 벨벳,26F,women,DOWN,,carryover,semi-shiny,TX2,short,,heavy,,800fp,horizontal,,VDDJ15256,BKL,1100,1419000000
+VDDJ16166,벨라트릭스,26F,women,DOWN,,carryover,semi-shiny,TX2,short,,heavy,,700fp,horizontal,,VDDJ16256,BKL,400,516000000
+VDDJ16266,벨라트릭스,26F,women,DOWN,,new,semi-matte,TX2,short,,heavy,,700fp,horizontal,,,CRS,200,258000000
+VDDV18166,중량 DV,26F,women,DOWN,,new,soft-matte,TX1,short,,medium,,800fp,horizontal,,,SAL,150,133500000
+VDDV18166,중량 DV,26F,women,DOWN,,new,soft-matte,TX1,short,,medium,,800fp,horizontal,,,BLL,150,133500000
+VDDJ17766,소재MIX 블루종,26F,women,DOWN,,new,soft-matte,TX1,short,,medium,,800fp,horizontal,,,IVS,180,214200000
+VDDJ19566,알와이드 CINZ,26F,women,DOWN,,new,shiny,TX1,middle,,medium,,800fp,horizontal,,,BGS,200,238000000
+VDDJ19566,알와이드 CINZ,26F,women,DOWN,,new,shiny,TX1,middle,,medium,,800fp,horizontal,,,BRD,200,238000000
+VDDJ35965,엘베지아 미드,26F,women,DOWN,,carryover,semi-matte,TX1,middle,,medium,,800fp,horizontal,,VDDJ35956,IVD,200,238000000
+VDDJ35965,엘베지아 미드,26F,women,DOWN,,carryover,semi-matte,TX1,middle,,medium,,800fp,horizontal,,VDDJ35956,GRD,300,357000000
+VDDJ35965,엘베지아 미드,26F,women,DOWN,,carryover,semi-matte,TX1,middle,,medium,,800fp,horizontal,,VDDJ35956,BKS,500,595000000
+VDDJ35766,엘베지아,26F,women,DOWN,,carryover,semi-matte,TX1,long,,medium,,800fp,horizontal,,VDDJ35756,IVD,200,258000000
+VDDJ35766,엘베지아,26F,women,DOWN,,carryover,semi-matte,TX1,long,,medium,,800fp,horizontal,,VDDJ35756,BKS,400,516000000
+VDDJ10566,코르티나 N,26F,women,DOWN,,new,matte,TX2,long,,medium,,700fp,nonquilting,,,IVD,150,238500000
+VDDJ10566,코르티나 N,26F,women,DOWN,,new,matte,TX2,long,,medium,,700fp,nonquilting,,,BKS,250,397500000
+VDDJ15166,디아데마 N 체크,26F,women,DOWN,,new,matte,TX2,short,,heavy,,800fp,horizontal,,,BRD,200,238000000
+VDDJ25166,디아데마 N,26F,women,DOWN,,new,matte,TX2,short,,heavy,,700fp,horizontal,,,INS,200,238000000
+VDDJ25266,디아데마 N,26F,women,DOWN,,new,semi-shiny,TX2,short,,heavy,,700fp,horizontal,,,WHL,200,238000000
+VDDJ37166,알로로,26F,women,DOWN,,carryover,shiny,TX1,middle,,heavy,,800fp,horizontal,,VDDJ31756,MTL,200,258000000
+VDDJ37166,알로로,26F,women,DOWN,,carryover,shiny,TX1,middle,,heavy,,800fp,horizontal,,VDDJ31756,BRD,400,516000000
+VDDJ37166,알로로,26F,women,DOWN,,carryover,shiny,TX1,middle,,heavy,,800fp,horizontal,,VDDJ31756,BKS,1000,1290000000
+VDDJ37366,알로로 벨벳,26F,women,DOWN,,carryover,semi-shiny,TX2,middle,,heavy,,800fp,horizontal,,VDDJ31656,BKL,3000,4170000000
+VDDJ31666,알로로 사틴,26F,women,DOWN,,new,semi-matte,TX2,middle,,heavy,,800fp,horizontal,,,CRS,320,444800000
+VDDJ31666,알로로 사틴,26F,women,DOWN,,new,semi-matte,TX2,middle,,heavy,,800fp,horizontal,,,BKL,510,708900000
+VDDJ31766,알로로 무광,26F,women,DOWN,,new,soft-matte,TX1,middle,,heavy,,800fp,horizontal,,,IVS,200,258000000
+VDDJ31766,알로로 무광,26F,women,DOWN,,new,soft-matte,TX1,middle,,heavy,,800fp,horizontal,,,BLS,200,258000000
+VDDJ31766,알로로 무광,26F,women,DOWN,,new,soft-matte,TX1,middle,,heavy,,800fp,horizontal,,,CAS,390,503100000
+VDDJ37666,알로로 체크,26F,women,DOWN,,new,matte,TX2,middle,,heavy,,800fp,horizontal,,,BRD,300,447000000
+VDDJ16466,벨라트릭스 미드,26F,women,DOWN,,new,semi-shiny,TX4,middle,,heavy,,700fp,horizontal,,,BKL,280,473200000
+VDDJ16866,벨라트릭스 미드 슈가,26F,women,DOWN,,new,soft-matte,TX1,middle,,heavy,,800fp,horizontal,,,CRS,200,258000000
+VDDJ16866,벨라트릭스 미드 슈가,26F,women,DOWN,,new,soft-matte,TX1,middle,,heavy,,800fp,horizontal,,,BKS,300,387000000
+VDDJ31166,라바로네,26F,women,DOWN,,carryover,semi-matte,TX1,long,,heavy,,800fp,horizontal,,VDDJ31156,IVD,600,894000000
+VDDJ31166,라바로네,26F,women,DOWN,,carryover,semi-matte,TX1,long,,heavy,,800fp,horizontal,,VDDJ31156,GRD,300,447000000
+VDDJ31166,라바로네,26F,women,DOWN,,carryover,semi-matte,TX1,long,,heavy,,800fp,horizontal,,VDDJ31156,BKS,1400,2086000000
+VDDJ18966,알바르다 미드,26F,women,DOWN,,new,shiny,TX1,middle,,medium,,800fp,horizontal,,,BGS,150,208500000
+VDDJ18966,알바르다 미드,26F,women,DOWN,,new,shiny,TX1,middle,,medium,,800fp,horizontal,,,BKS,215,298850000
+VDDJ19366,네모바라 미드,26F,women,DOWN,,new,shiny,TX1,middle,,heavy,,800fp,square,,,CRS,150,193500000
+VDDJ19366,네모바라 미드,26F,women,DOWN,,new,shiny,TX1,middle,,heavy,,800fp,square,,,BRD,250,322500000
+VDDJ18566,마라테아 미드(FUR),26F,women,DOWN,,new,semi-matte,TX1,middle,,heavy,,800fp,horizontal,,,CRS,600,954000000
+VDDJ18566,마라테아 미드(FUR),26F,women,DOWN,,new,semi-matte,TX1,middle,,heavy,,800fp,horizontal,,,BGS,400,636000000
+VDDJ18566,마라테아 미드(FUR),26F,women,DOWN,,new,semi-matte,TX1,middle,,heavy,,800fp,horizontal,,,BKS,1500,2385000000
+VDDJ18766,마라테아(FUR),26F,women,DOWN,,new,semi-matte,TX1,long,,heavy,,800fp,horizontal,,,IVD,400,716000000
+VDDJ18766,마라테아(FUR),26F,women,DOWN,,new,semi-matte,TX1,long,,heavy,,800fp,horizontal,,,CAS,400,716000000
+VDDJ18766,마라테아(FUR),26F,women,DOWN,,new,semi-matte,TX1,long,,heavy,,800fp,horizontal,,,BKS,1000,1790000000
+VDDJ30766,소바라,26F,women,DOWN,,carryover,shiny,TX1,long,,heavy,,800fp,diamond,,VDDJ30756,BGL,700,903000000
+VDDJ30766,소바라,26F,women,DOWN,,carryover,shiny,TX1,long,,heavy,,800fp,diamond,,VDDJ30756,OLS,200,258000000
+VDDJ30766,소바라,26F,women,DOWN,,carryover,shiny,TX1,long,,heavy,,800fp,diamond,,VDDJ30756,BKS,800,1032000000
+VDDJ31866,레미에,26F,women,DOWN,,carryover,shiny,TX1,long,,heavy,,800fp,horizontal,,VDDJ31856,BKS,1000,1590000000

@@ -162,10 +162,6 @@ const SeasonClosing = () => {
 
   return (
     <>
-      <p className="text-sm text-gray-400 mb-4">
-        {metadata?.total_styles || 0}개 스타일 | 생성: {metadata?.generated_at || '-'}
-      </p>
-
       {/* AI 종합 코멘트 */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex items-start justify-between">
@@ -372,6 +368,9 @@ const SeasonClosing = () => {
           </div>
         </div>
 
+      <p className="text-sm text-gray-400 mt-2">
+        {metadata?.total_styles || 0}개 스타일 | 생성: {metadata?.generated_at || '-'}
+      </p>
     </>
   );
 };

@@ -82,7 +82,7 @@ function PageHeader({ step }) {
         <Icon className="w-8 h-8 text-blue-600" />
         <h1 className="text-2xl font-bold text-gray-900">{step.title}</h1>
       </div>
-      <p className="text-gray-500 ml-11">{step.desc}</p>
+      <p className="text-sm text-gray-500 ml-11">{step.desc}</p>
     </header>
   )
 }

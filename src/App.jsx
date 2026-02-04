@@ -20,12 +20,12 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 font-sans">
       {/* Header */}
       <header className="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-[1400px] mx-auto px-8 py-4">
+        <div className="max-w-[1400px] mx-auto px-8 py-[34px]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-violet-500 rounded-lg flex items-center justify-center font-bold text-white shadow-inner">
               AI
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-100">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-100">
               Initial Order Simulator <span className="text-xs font-normal text-slate-400 ml-1 opacity-70">v1.0</span>
             </h1>
           </div>

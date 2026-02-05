@@ -1333,6 +1333,57 @@ def export_season_closing_json(
 
     total_styles = len(style_analysis) if not style_analysis.empty else 0
 
+    # Top/Bottom 10 스타일 추출
+    top_performers = []
+    bottom_performers = []
+    if not style_analysis.empty and '판매율' in style_analysis.columns:
+        style_cols = ['스타일코드', '중분류', '아이템명', '등급', '액션', '판매율', 'AI코멘트']
+        available_cols = [c for c in style_cols if c in style_analysis.columns]
+
+        top_df = style_analysis.nlargest(10, '판매율')[available_cols]
+        bottom_df = style_analysis.nsmallest(10, '판매율')[available_cols]
+
+        for _, row in top_df.iterrows():
+            top_performers.append({
+                "style_cd": str(row.get("스타일코드", "")),
+                "class2": str(row.get("중분류", "")),
+                "item_nm": str(row.get("아이템명", "")),
+                "grade": str(row.get("등급", "")),
+                "action": str(row.get("액션", "")),
+                "sell_through_rate": float(row.get("판매율", 0)),
+                "ai_comment": str(row.get("AI코멘트", ""))
+            })
+
+        for _, row in bottom_df.iterrows():
+            bottom_performers.append({
+                "style_cd": str(row.get("스타일코드", "")),
+                "class2": str(row.get("중분류", "")),
+                "item_nm": str(row.get("아이템명", "")),
+                "grade": str(row.get("등급", "")),
+                "action": str(row.get("액션", "")),
+                "sell_through_rate": float(row.get("판매율", 0)),
+                "ai_comment": str(row.get("AI코멘트", ""))
+            })
+
+    # 액션별 스타일 목록 추출
+    action_styles = {}
+    if not style_analysis.empty and '액션' in style_analysis.columns:
+        for action in ['Aggressive', 'Expand', 'Maintain', 'Observation', 'Cut/Drop']:
+            action_df = style_analysis[style_analysis['액션'] == action].sort_values('판매율', ascending=(action in ['Observation', 'Cut/Drop']))
+            styles_list = []
+            for _, row in action_df.iterrows():
+                styles_list.append({
+                    "style_cd": str(row.get("스타일코드", "")),
+                    "class2": str(row.get("중분류", "")),
+                    "item_nm": str(row.get("아이템명", "")),
+                    "grade": str(row.get("등급", "")),
+                    "sell_through_rate": float(row.get("판매율", 0)),
+                    "in_qty": int(row.get("발주수량", 0)),
+                    "sale_qty": int(row.get("판매수량", 0)),
+                    "ai_comment": str(row.get("AI코멘트", ""))
+                })
+            action_styles[action] = styles_list
+
     # 총 매출금액/입고금액 집계
     total_sale_amt = sum(c.get("sale_amt", 0) for c in class_list) if class_list else 0
     total_in_amt = sum(c.get("in_amt", 0) for c in class_list) if class_list else 0
@@ -1358,7 +1409,10 @@ def export_season_closing_json(
         "item_analysis": item_list,
         "style_summary": {
             "grade_distribution": {k: int(v) for k, v in grade_dist.items()},
-            "action_distribution": {k: int(v) for k, v in action_dist.items()}
+            "action_distribution": {k: int(v) for k, v in action_dist.items()},
+            "top_performers": top_performers,
+            "bottom_performers": bottom_performers,
+            "action_styles": action_styles
         }
     }
 

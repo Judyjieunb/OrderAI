@@ -1,15 +1,18 @@
 """
-FastAPI 백엔드: AI 예산 제안 프록시 (OpenAI / Claude API) + 예산 확정 저장
+FastAPI 백엔드: AI 예산 제안 프록시 (OpenAI / Claude API) + 예산 확정 저장 + 유사스타일 확정
 
 실행: uvicorn server.api:app --port 8000 --reload
 환경변수: OPENAI_API_KEY (우선) 또는 ANTHROPIC_API_KEY
 """
 
 import json
+import math
 import os
 from datetime import datetime, timezone
 from typing import List, Optional
 
+import pandas as pd
+import numpy as np
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -344,6 +347,347 @@ async def save_budget_config(config: BudgetConfigRequest):
         json.dump(output, f, ensure_ascii=False, indent=2)
 
     return {"status": "ok", "path": BUDGET_CONFIG_PATH}
+
+
+# ── 유사스타일 확정 → 발주추천 ────────────────────────────
+
+CONFIRMED_MAPPING_PATH = os.path.join(OUTPUT_DIR, "confirmed_mapping.json")
+ANALYSIS_RESULT_PATH = os.path.join(OUTPUT_DIR, "25S_TimeSeries_Analysis_Result.xlsx")
+ORDER_REC_JSON = os.path.join(OUTPUT_DIR, "26S_Order_Recommendation.json")
+ORDER_REC_EXCEL = os.path.join(OUTPUT_DIR, "26S_Order_Recommendation.xlsx")
+ORDER_REC_PUBLIC_JSON = os.path.join(PUBLIC_DIR, "order_recommendation_data.json")
+
+# STEP2/3 결과 컬럼명
+_COL_PART_CD = "PART_CD"
+_COL_ITEM_NM = "ITEM_NM"
+_COL_PRICE = "판매가"
+_COL_TOTAL_ORDER = "총발주"
+_COL_TOTAL_INBOUND = "총입고"
+_COL_TOTAL_SALE = "총판매"
+_COL_SELL_RATE = "최종판매율"
+_COL_AI_DIAG = "AI_진단"
+_COL_AI_OPP_COST = "AI 계산 기회비용"
+_COL_AI_ORDER = "AI제안 발주량"
+
+
+def _ceil_10(x):
+    """10단위 올림"""
+    if x is None or x != x or x <= 0:  # NaN check without pandas
+        return 0
+    return int(math.ceil(x / 10) * 10)
+
+
+def _load_style_summary() -> pd.DataFrame:
+    """STEP2/3 분석 결과를 스타일 레벨로 집계하여 반환"""
+    df = pd.read_excel(ANALYSIS_RESULT_PATH)
+
+    for col in [_COL_TOTAL_ORDER, _COL_TOTAL_INBOUND, _COL_TOTAL_SALE,
+                _COL_AI_OPP_COST, _COL_AI_ORDER, _COL_SELL_RATE]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+
+    agg_dict = {
+        _COL_TOTAL_ORDER: "sum",
+        _COL_TOTAL_INBOUND: "sum",
+        _COL_TOTAL_SALE: "sum",
+        _COL_AI_OPP_COST: "sum",
+        _COL_AI_ORDER: "sum",
+        _COL_PRICE: "first",
+        _COL_ITEM_NM: "first",
+    }
+    agg_dict = {k: v for k, v in agg_dict.items() if k in df.columns}
+
+    style_summary = df.groupby(_COL_PART_CD).agg(agg_dict).reset_index()
+
+    # 판매율 = 총판매/총입고*100
+    if _COL_TOTAL_SALE in style_summary.columns and _COL_TOTAL_INBOUND in style_summary.columns:
+        style_summary[_COL_SELL_RATE] = (
+            style_summary[_COL_TOTAL_SALE] / style_summary[_COL_TOTAL_INBOUND].replace(0, np.nan) * 100
+        ).fillna(0).round(1)
+
+    # 대표 진단
+    diag_priority = {
+        "🟢Hit (적기 소진)": 1,
+        "🚨Early Shortage (5월전 품절)": 2,
+        "⚠️Shortage (시즌중 품절)": 3,
+        "⚪Normal": 4,
+        "🔴Risk (부진)": 5,
+    }
+    if _COL_AI_DIAG in df.columns:
+        def _rep_diag(series):
+            vals = series.dropna().unique()
+            if len(vals) == 0:
+                return "-"
+            return min(vals, key=lambda x: diag_priority.get(x, 99))
+        diag_series = df.groupby(_COL_PART_CD)[_COL_AI_DIAG].apply(_rep_diag)
+        style_summary = style_summary.merge(diag_series.reset_index(), on=_COL_PART_CD, how="left")
+
+    return style_summary
+
+
+def _load_color_detail() -> pd.DataFrame:
+    """STEP2/3 분석 결과를 컬러 레벨 그대로 반환 (배분용)"""
+    df = pd.read_excel(ANALYSIS_RESULT_PATH)
+    for col in [_COL_AI_ORDER, _COL_PRICE]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    return df
+
+
+def _get_color_breakdown(ref_part_cd: str, color_df: pd.DataFrame, total_qty: int) -> list:
+    """ref 스타일의 컬러별 AI발주량 비중으로 total_qty를 배분"""
+    rows = color_df[color_df[_COL_PART_CD] == ref_part_cd]
+    if rows.empty or _COL_AI_ORDER not in rows.columns:
+        return []
+
+    color_orders = []
+    for _, r in rows.iterrows():
+        color_orders.append({
+            "color_cd": str(r.get("COLOR_CD", "")),
+            "ai_order": float(r.get(_COL_AI_ORDER, 0)),
+        })
+
+    total_ai = sum(c["ai_order"] for c in color_orders)
+    if total_ai <= 0:
+        return []
+
+    colors = []
+    distributed = 0
+    for i, c in enumerate(color_orders):
+        ratio = c["ai_order"] / total_ai
+        if i == len(color_orders) - 1:
+            # 마지막 컬러: 나머지 배분 (10단위 올림 오차 보정)
+            qty = total_qty - distributed
+        else:
+            qty = _ceil_10(total_qty * ratio)
+            distributed += qty
+        colors.append({
+            "color_cd": c["color_cd"],
+            "ratio": round(ratio * 100, 1),
+            "qty": max(qty, 0),
+        })
+
+    return colors
+
+
+class ConfirmedMappingItem(BaseModel):
+    new_part_cd: str
+    new_item_nm: str
+    new_class2: str
+    selected_ref_part_cd: Optional[str] = None
+    selected_ref_score: Optional[float] = None
+    manual_order_qty: Optional[int] = None  # 매칭 불가 스타일의 수동 입력 발주량
+
+
+class ConfirmedMappingRequest(BaseModel):
+    season: str = "26S"
+    mappings: List[ConfirmedMappingItem]
+
+
+@app.post("/api/confirmed-mapping")
+async def save_confirmed_mapping(req: ConfirmedMappingRequest):
+    """
+    유사스타일 확정 저장 + 추천발주량 계산 + 결과 저장
+    1. confirmed_mapping.json 저장
+    2. 확정 ref의 AI제안 발주량 조회 → 추천발주량
+    3. budget_config.json 예산 천장 스케일링
+    4. 26S_Order_Recommendation.json + .xlsx 저장
+    """
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    # 1. confirmed_mapping.json 저장
+    confirmed = {
+        "season": req.season,
+        "confirmed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "mappings": [m.model_dump() for m in req.mappings],
+    }
+    with open(CONFIRMED_MAPPING_PATH, "w", encoding="utf-8") as f:
+        json.dump(confirmed, f, ensure_ascii=False, indent=2)
+
+    # 2. 분석 결과 로드
+    if not os.path.exists(ANALYSIS_RESULT_PATH):
+        raise HTTPException(
+            status_code=404,
+            detail="25S_TimeSeries_Analysis_Result.xlsx가 없습니다. 파이프라인을 먼저 실행하세요."
+        )
+
+    style_summary = _load_style_summary()
+    color_df = _load_color_detail()
+
+    # 3. 각 확정 스타일의 추천발주량 산출
+    results = []
+    for m in req.mappings:
+        # 수동 입력 발주량 (매칭 불가 스타일)
+        if m.manual_order_qty is not None:
+            results.append({
+                "new_part_cd": m.new_part_cd,
+                "new_item_nm": m.new_item_nm,
+                "new_class2": m.new_class2,
+                "추천발주량": _ceil_10(m.manual_order_qty),
+                "budget_scaled": False,
+                "manual_input": True,
+            })
+            continue
+
+        # 유사스타일 기반 발주량
+        ref_info = {}
+        ai_order = 0
+        if m.selected_ref_part_cd:
+            ref_match = style_summary[style_summary[_COL_PART_CD] == m.selected_ref_part_cd]
+            if not ref_match.empty:
+                row = ref_match.iloc[0]
+                ai_order = int(row.get(_COL_AI_ORDER, 0))
+                ref_info = {
+                    "ref_part_cd": m.selected_ref_part_cd,
+                    "ref_score": m.selected_ref_score,
+                    "ref_총판매": int(row.get(_COL_TOTAL_SALE, 0)),
+                    "ref_총입고": int(row.get(_COL_TOTAL_INBOUND, 0)),
+                    "ref_판매율": float(row.get(_COL_SELL_RATE, 0)),
+                    "ref_진단": str(row.get(_COL_AI_DIAG, "-")),
+                    "ref_AI발주량": ai_order,
+                    "판매가": int(row.get(_COL_PRICE, 0)),
+                }
+
+        results.append({
+            "new_part_cd": m.new_part_cd,
+            "new_item_nm": m.new_item_nm,
+            "new_class2": m.new_class2,
+            "추천발주량": _ceil_10(ai_order),
+            "budget_scaled": False,
+            **ref_info,
+        })
+
+    # 4. 예산 천장 스케일링
+    if os.path.exists(BUDGET_CONFIG_PATH):
+        with open(BUDGET_CONFIG_PATH, "r", encoding="utf-8") as f:
+            budget_config = json.load(f)
+
+        ceiling_map = {}
+        for cat in budget_config.get("category_budgets", []):
+            ceiling_map[cat["class2"]] = cat["budget_qty"]
+
+        if ceiling_map:
+            # 카테고리별 합산
+            cat_totals = {}
+            for rec in results:
+                cls2 = rec.get("new_class2", "")
+                qty = rec.get("추천발주량", 0)
+                if cls2 and qty > 0:
+                    cat_totals[cls2] = cat_totals.get(cls2, 0) + qty
+
+            # 스케일링 비율
+            scale_ratios = {}
+            for cls2, total_qty in cat_totals.items():
+                ceiling = ceiling_map.get(cls2)
+                if ceiling is not None and total_qty > ceiling and total_qty > 0:
+                    scale_ratios[cls2] = ceiling / total_qty
+
+            # 적용
+            for rec in results:
+                cls2 = rec.get("new_class2", "")
+                ratio = scale_ratios.get(cls2)
+                if ratio is not None and rec.get("추천발주량", 0) > 0:
+                    rec["original_recommendation"] = rec["추천발주량"]
+                    rec["추천발주량"] = _ceil_10(rec["추천발주량"] * ratio)
+                    rec["budget_scaled"] = True
+
+    # 5. 컬러별 배분
+    for rec in results:
+        ref_cd = rec.get("ref_part_cd")
+        qty = rec.get("추천발주량", 0)
+        if ref_cd and qty > 0:
+            rec["colors"] = _get_color_breakdown(ref_cd, color_df, qty)
+        elif rec.get("manual_input") and qty > 0:
+            rec["colors"] = [{"color_cd": "-", "ratio": 100.0, "qty": qty}]
+        else:
+            rec["colors"] = []
+
+    # 6. 예산 천장 정보 수집 (프론트엔드용)
+    budget_info = None
+    if os.path.exists(BUDGET_CONFIG_PATH):
+        with open(BUDGET_CONFIG_PATH, "r", encoding="utf-8") as f:
+            budget_info = json.load(f)
+
+    # 카테고리별 합산 (프론트엔드 표시용)
+    cat_summary = {}
+    for rec in results:
+        cls2 = rec.get("new_class2", "")
+        qty = rec.get("추천발주량", 0)
+        orig = rec.get("original_recommendation", qty)
+        price = rec.get("ref_AI발주량", 0)  # 판매가 조회 필요
+        if cls2:
+            if cls2 not in cat_summary:
+                cat_summary[cls2] = {"추천합계": 0, "스케일링전합계": 0}
+            cat_summary[cls2]["추천합계"] += qty
+            cat_summary[cls2]["스케일링전합계"] += orig
+
+    category_budgets = []
+    if budget_info:
+        for cat in budget_info.get("category_budgets", []):
+            cls2 = cat["class2"]
+            cs = cat_summary.get(cls2, {"추천합계": 0, "스케일링전합계": 0})
+            category_budgets.append({
+                "class2": cls2,
+                "budget_qty": cat["budget_qty"],
+                "recommended_qty": cs["추천합계"],
+                "pre_scale_qty": cs["스케일링전합계"],
+            })
+
+    # 7. JSON 저장
+    total = len(results)
+    matched = sum(1 for r in results if r.get("추천발주량", 0) > 0)
+    total_qty = sum(r.get("추천발주량", 0) for r in results)
+    scaled_count = sum(1 for r in results if r.get("budget_scaled"))
+
+    output_json = {
+        "metadata": {
+            "season": req.season,
+            "confirmed_at": confirmed["confirmed_at"],
+            "total_styles": total,
+            "matched_styles": matched,
+            "total_recommendation_qty": total_qty,
+            "scaled_count": scaled_count,
+            "category_budgets": category_budgets,
+        },
+        "recommendations": results,
+    }
+
+    with open(ORDER_REC_JSON, "w", encoding="utf-8") as f:
+        json.dump(output_json, f, ensure_ascii=False, indent=2)
+
+    # 프론트엔드용 public JSON
+    os.makedirs(PUBLIC_DIR, exist_ok=True)
+    with open(ORDER_REC_PUBLIC_JSON, "w", encoding="utf-8") as f:
+        json.dump(output_json, f, ensure_ascii=False, indent=2)
+
+    # 8. Excel 저장 (컬러별 전개)
+    if results:
+        excel_rows = []
+        for rec in results:
+            for c in rec.get("colors", []):
+                excel_rows.append({
+                    "NEW_PART_CD": rec["new_part_cd"],
+                    "NEW_ITEM_NM": rec["new_item_nm"],
+                    "NEW_CLASS2": rec["new_class2"],
+                    "COLOR_CD": c["color_cd"],
+                    "비중(%)": c["ratio"],
+                    "AI추천수량": c["qty"],
+                    "스타일합계": rec["추천발주량"],
+                    "budget_scaled": rec.get("budget_scaled", False),
+                })
+        if not excel_rows:
+            excel_rows = [{"message": "추천 데이터 없음"}]
+        edf = pd.DataFrame(excel_rows)
+        with pd.ExcelWriter(ORDER_REC_EXCEL, engine="openpyxl") as writer:
+            edf.to_excel(writer, index=False, sheet_name="26S 발주 추천")
+
+    return {
+        "status": "ok",
+        "total_styles": total,
+        "matched_styles": matched,
+        "total_recommendation_qty": total_qty,
+        "results": results,
+    }
 
 
 @app.get("/api/health")

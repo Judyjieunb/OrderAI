@@ -15,6 +15,7 @@ from openpyxl import load_workbook
 import os
 import io
 import json
+from config_loader import get_grade_thresholds
 
 
 # ============================================
@@ -359,18 +360,19 @@ def analyze_item_efficiency(df: pd.DataFrame) -> pd.DataFrame:
     item_summary['BCG분류'] = item_summary.apply(classify_bcg, axis=1)
     
     # 등급 부여 (의류 기준)
+    _thresholds = get_grade_thresholds()
     def assign_grade(str_rate):
-        if str_rate >= 75:
+        if str_rate >= _thresholds['S']:
             return "S"
-        elif str_rate >= 65:
+        elif str_rate >= _thresholds['A']:
             return "A"
-        elif str_rate >= 55:
+        elif str_rate >= _thresholds['B']:
             return "B"
-        elif str_rate >= 40:
+        elif str_rate >= _thresholds['C']:
             return "C"
         else:
             return "D"
-    
+
     item_summary['등급'] = item_summary['판매율'].apply(assign_grade)
     
     # AI 코멘트 생성
@@ -465,18 +467,19 @@ def analyze_style_detail(df: pd.DataFrame) -> pd.DataFrame:
         style_df = style_df.drop(columns=['IN_QTY'], errors='ignore')  # 원본 컬럼 삭제
     
     # 등급 부여
+    _thresholds_s = get_grade_thresholds()
     def assign_grade(str_rate):
-        if str_rate >= 75:
+        if str_rate >= _thresholds_s['S']:
             return "S"
-        elif str_rate >= 65:
+        elif str_rate >= _thresholds_s['A']:
             return "A"
-        elif str_rate >= 55:
+        elif str_rate >= _thresholds_s['B']:
             return "B"
-        elif str_rate >= 40:
+        elif str_rate >= _thresholds_s['C']:
             return "C"
         else:
             return "D"
-    
+
     style_df['등급'] = style_df['판매율'].apply(assign_grade)
     
     # 액션 가이드 생성
@@ -1036,10 +1039,11 @@ def create_style_scatter(style_analysis: pd.DataFrame, output_dir: str = 'temp_c
             )
     
     # 판매율 기준선 표시
-    ax.axhline(y=75, color='red', linestyle='--', linewidth=1.5, alpha=0.5, label='S등급 기준 (75%)')
-    ax.axhline(y=65, color='orange', linestyle='--', linewidth=1.5, alpha=0.5, label='A등급 기준 (65%)')
-    ax.axhline(y=55, color='green', linestyle='--', linewidth=1.5, alpha=0.5, label='B등급 기준 (55%)')
-    ax.axhline(y=40, color='yellow', linestyle='--', linewidth=1.5, alpha=0.5, label='C등급 기준 (40%)')
+    _t = get_grade_thresholds()
+    ax.axhline(y=_t['S'], color='red', linestyle='--', linewidth=1.5, alpha=0.5, label=f'S등급 기준 ({_t["S"]}%)')
+    ax.axhline(y=_t['A'], color='orange', linestyle='--', linewidth=1.5, alpha=0.5, label=f'A등급 기준 ({_t["A"]}%)')
+    ax.axhline(y=_t['B'], color='green', linestyle='--', linewidth=1.5, alpha=0.5, label=f'B등급 기준 ({_t["B"]}%)')
+    ax.axhline(y=_t['C'], color='yellow', linestyle='--', linewidth=1.5, alpha=0.5, label=f'C등급 기준 ({_t["C"]}%)')
     
     ax.set_xlabel('발주수량', fontsize=12, fontweight='bold')
     ax.set_ylabel('판매율 (%)', fontsize=12, fontweight='bold')

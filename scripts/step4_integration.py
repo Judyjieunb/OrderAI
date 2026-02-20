@@ -1,10 +1,13 @@
 """
-STEP 4: 유사스타일 맵핑 → 당시즌(26S) 발주 제안
+STEP 5: 유사스타일 맵핑 데이터 생성 (프론트엔드용)
 
-전시즌(25S) STEP2/3 분석 결과를 기반으로, ML 유사스타일 맵핑을 통해
-26S 신규 스타일의 추천 발주량을 산출합니다.
+전시즌(25S) STEP2/3 분석 결과를 기반으로, ML 유사스타일 맵핑 데이터를
+프론트엔드에서 사용할 JSON으로 변환합니다.
 
-실행 순서: STEP1 → STEP2 → STEP3 → STEP4 (마지막)
+유저가 프론트엔드 Step 3에서 유사스타일을 확정하면,
+서버 API가 확정 결과를 바탕으로 추천발주량을 산출합니다.
+
+실행 순서: STEP1 → STEP2 → STEP3 → STEP4 → STEP5 (이 스크립트)
 """
 
 import os
@@ -22,13 +25,13 @@ import numpy as np
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+PUBLIC_DIR = os.path.join(BASE_DIR, "public")
 
 ANALYSIS_RESULT_FILE = os.path.join(OUTPUT_DIR, "25S_TimeSeries_Analysis_Result.xlsx")
 DEFAULT_MAPPING_FILE = os.path.join(DATA_DIR, "similarity_mapping.csv")
 SAMPLE_MAPPING_FILE = os.path.join(DATA_DIR, "similarity_mapping_sample.csv")
 
-OUTPUT_EXCEL = os.path.join(OUTPUT_DIR, "26S_Order_Recommendation.xlsx")
-OUTPUT_JSON = os.path.join(OUTPUT_DIR, "26S_Order_Recommendation.json")
+OUTPUT_JSON = os.path.join(PUBLIC_DIR, "style_mapping_data.json")
 
 # ── 상수 ────────────────────────────────────────────────────
 MIN_SCORE = 0.50          # 최소 유사도 임계값
@@ -150,7 +153,7 @@ def load_analysis_result() -> pd.DataFrame:
             return "-"
         return min(vals, key=lambda x: diag_priority.get(x, 99))
 
-    # 스타일 레벨(PART_CD)로 집계
+    # 스타일 레벨(PART_CD)로 집계 — 판매율은 mean이 아닌 sum/sum으로 직접 계산
     agg_dict = {
         COL_TOTAL_ORDER: "sum",
         COL_TOTAL_INBOUND: "sum",
@@ -159,7 +162,6 @@ def load_analysis_result() -> pd.DataFrame:
         COL_AI_ORDER: "sum",
         COL_PRICE: "first",
         COL_ITEM_NM: "first",
-        COL_SELL_RATE: "mean",
     }
 
     # 존재하는 컬럼만 집계
@@ -167,14 +169,16 @@ def load_analysis_result() -> pd.DataFrame:
 
     style_summary = df.groupby(COL_PART_CD).agg(agg_dict).reset_index()
 
+    # 판매율 = 총판매 / 총입고 * 100 (mean 버그 수정)
+    if COL_TOTAL_SALE in style_summary.columns and COL_TOTAL_INBOUND in style_summary.columns:
+        style_summary[COL_SELL_RATE] = (
+            style_summary[COL_TOTAL_SALE] / style_summary[COL_TOTAL_INBOUND].replace(0, np.nan) * 100
+        ).fillna(0).round(1)
+
     # 대표 진단 별도 처리
     if COL_AI_DIAG in df.columns:
         diag_series = df.groupby(COL_PART_CD)[COL_AI_DIAG].apply(representative_diag)
         style_summary = style_summary.merge(diag_series.reset_index(), on=COL_PART_CD, how="left")
-
-    # 판매율 반올림
-    if COL_SELL_RATE in style_summary.columns:
-        style_summary[COL_SELL_RATE] = style_summary[COL_SELL_RATE].round(1)
 
     print(f"    - 스타일 수 (PART_CD별): {len(style_summary)}")
     return style_summary
@@ -221,60 +225,9 @@ def get_top3_references(mapping_row: pd.Series, style_summary: pd.DataFrame) -> 
     return refs
 
 
-def determine_confidence(refs: List[dict]) -> str:
-    """유사스타일 매칭 신뢰도 판정"""
-    if not refs:
-        return "none"
-    top_score = max(r["score"] for r in refs)
-    valid_count = len(refs)
-
-    if top_score >= 0.85 and valid_count >= 2:
-        return "high"
-    elif top_score >= 0.70 and valid_count >= 1:
-        return "medium"
-    elif top_score >= 0.50:
-        return "low"
-    return "none"
-
-
-def calculate_weighted_baseline(refs: List[dict]) -> dict:
-    """Top 3 유사스타일의 유사도 점수 기반 가중평균 산출"""
-    if not refs:
-        return {
-            "가중_판매량": 0,
-            "가중_판매율": 0,
-            "가중_기회비용": 0,
-            "가중_AI발주량": 0,
-            "추천발주량": 0,
-        }
-
-    total_weight = sum(r["score"] for r in refs)
-    if total_weight == 0:
-        return {
-            "가중_판매량": 0,
-            "가중_판매율": 0,
-            "가중_기회비용": 0,
-            "가중_AI발주량": 0,
-            "추천발주량": 0,
-        }
-
-    weighted_sale = sum(r["score"] * r["총판매"] for r in refs) / total_weight
-    weighted_rate = sum(r["score"] * r["판매율"] for r in refs) / total_weight
-    weighted_cost = sum(r["score"] * r["기회비용"] for r in refs) / total_weight
-    weighted_ai_order = sum(r["score"] * r["AI발주량"] for r in refs) / total_weight
-
-    return {
-        "가중_판매량": round(weighted_sale),
-        "가중_판매율": round(weighted_rate, 1),
-        "가중_기회비용": round(weighted_cost),
-        "가중_AI발주량": round(weighted_ai_order),
-        "추천발주량": ceil_10(weighted_ai_order),
-    }
-
-
-def process_recommendations(mapping_df: pd.DataFrame, style_summary: pd.DataFrame) -> List[dict]:
-    """전체 26S 스타일에 대한 추천 발주량 산출"""
-    results = []
+def generate_style_mapping_json(mapping_df: pd.DataFrame, style_summary: pd.DataFrame) -> dict:
+    """전체 26S 스타일에 대한 맵핑 JSON 생성 (프론트엔드용)"""
+    styles = []
     matched = 0
     unmatched = 0
 
@@ -284,216 +237,48 @@ def process_recommendations(mapping_df: pd.DataFrame, style_summary: pd.DataFram
         new_class2 = str(row.get("NEW_CLASS2", "")).strip()
 
         refs = get_top3_references(row, style_summary)
-        confidence = determine_confidence(refs)
-        baseline = calculate_weighted_baseline(refs)
 
-        if confidence == "none":
-            unmatched += 1
-        else:
+        if refs:
             matched += 1
+        else:
+            unmatched += 1
 
-        rec = {
-            "NEW_PART_CD": new_part_cd,
-            "NEW_ITEM_NM": new_item_nm,
-            "NEW_CLASS2": new_class2,
-            "references": refs,
-            "confidence": confidence,
-            **baseline,
-        }
-        results.append(rec)
+        styles.append({
+            "new_part_cd": new_part_cd,
+            "new_item_nm": new_item_nm,
+            "new_class2": new_class2,
+            "references": [
+                {
+                    "rank": r["rank"],
+                    "part_cd": r["part_cd"],
+                    "item_nm": r["아이템명"],
+                    "score": r["score"],
+                    "총판매": r["총판매"],
+                    "총입고": r["총입고"],
+                    "판매율": r["판매율"],
+                    "진단": r["진단"],
+                    "AI발주량": r["AI발주량"],
+                    "기회비용": r["기회비용"],
+                    "판매가": r["판매가"],
+                }
+                for r in refs
+            ],
+        })
 
     print(f"    - 매칭 성공: {matched}, 매칭 불가: {unmatched}")
-    return results
-
-
-def save_excel(results: List[dict], output_path: str):
-    """추천 결과를 Excel로 저장"""
-    rows = []
-    for rec in results:
-        row = {
-            "NEW_PART_CD": rec["NEW_PART_CD"],
-            "NEW_ITEM_NM": rec["NEW_ITEM_NM"],
-            "NEW_CLASS2": rec["NEW_CLASS2"],
-        }
-
-        # Top 1~3 유사스타일 상세
-        for i in range(1, 4):
-            prefix = f"유사스타일{i}"
-            ref = next((r for r in rec["references"] if r["rank"] == i), None)
-            if ref:
-                row[f"{prefix}_품번"] = ref["part_cd"]
-                row[f"{prefix}_유사도"] = ref["score"]
-                row[f"{prefix}_총판매"] = ref["총판매"]
-                row[f"{prefix}_판매율"] = ref["판매율"]
-                row[f"{prefix}_진단"] = ref["진단"]
-                row[f"{prefix}_AI발주량"] = ref["AI발주량"]
-            else:
-                row[f"{prefix}_품번"] = "-"
-                row[f"{prefix}_유사도"] = "-"
-                row[f"{prefix}_총판매"] = "-"
-                row[f"{prefix}_판매율"] = "-"
-                row[f"{prefix}_진단"] = "-"
-                row[f"{prefix}_AI발주량"] = "-"
-
-        # 가중 기준값
-        row["가중_전시즌_판매량"] = rec["가중_판매량"] if rec["confidence"] != "none" else "-"
-        row["가중_전시즌_판매율"] = rec["가중_판매율"] if rec["confidence"] != "none" else "-"
-        row["가중_전시즌_기회비용"] = rec["가중_기회비용"] if rec["confidence"] != "none" else "-"
-        row["가중_전시즌_AI발주량"] = rec["가중_AI발주량"] if rec["confidence"] != "none" else "-"
-        row["26S_추천발주량"] = rec["추천발주량"] if rec["confidence"] != "none" else "-"
-        row["confidence"] = rec["confidence"]
-        if rec.get("budget_scaled"):
-            row["budget_scaled"] = True
-            row["original_recommendation"] = rec.get("original_recommendation", "-")
-
-        rows.append(row)
-
-    df = pd.DataFrame(rows)
-
-    with pd.ExcelWriter(output_path, engine="openpyxl") as writer:
-        df.to_excel(writer, index=False, sheet_name="26S 발주 추천")
-
-        # 컬럼 너비 자동 조정
-        ws = writer.sheets["26S 발주 추천"]
-        for col_idx, col_name in enumerate(df.columns, 1):
-            max_len = max(
-                len(str(col_name)),
-                df[col_name].astype(str).str.len().max() if len(df) > 0 else 0
-            )
-            ws.column_dimensions[chr(64 + col_idx) if col_idx <= 26
-                                  else chr(64 + (col_idx - 1) // 26) + chr(65 + (col_idx - 1) % 26)
-                                  ].width = min(max_len + 3, 30)
-
-    print(f"  ▸ Excel 저장 완료: {os.path.basename(output_path)}")
-
-
-def save_json(results: List[dict], output_path: str):
-    """추천 결과를 JSON으로 저장"""
-    total = len(results)
-    matched = sum(1 for r in results if r["confidence"] != "none")
 
     output = {
         "metadata": {
             "new_season": NEW_SEASON,
             "ref_season": REF_SEASON,
             "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "total_styles": total,
+            "total_styles": len(styles),
             "matched_styles": matched,
-            "unmatched_styles": total - matched,
+            "unmatched_styles": unmatched,
         },
-        "recommendations": [],
+        "styles": styles,
     }
-
-    for rec in results:
-        item = {
-            "new_part_cd": rec["NEW_PART_CD"],
-            "new_item_nm": rec["NEW_ITEM_NM"],
-            "new_class2": rec["NEW_CLASS2"],
-            "references": [
-                {
-                    "rank": r["rank"],
-                    "part_cd": r["part_cd"],
-                    "score": r["score"],
-                    "총판매": r["총판매"],
-                    "판매율": r["판매율"],
-                    "진단": r["진단"],
-                    "AI발주량": r["AI발주량"],
-                }
-                for r in rec["references"]
-            ],
-            "weighted_baseline": {
-                "가중_판매량": rec["가중_판매량"],
-                "가중_판매율": rec["가중_판매율"],
-                "가중_기회비용": rec["가중_기회비용"],
-                "가중_AI발주량": rec["가중_AI발주량"],
-            },
-            "추천발주량": rec["추천발주량"],
-            "confidence": rec["confidence"],
-            "budget_scaled": rec.get("budget_scaled", False),
-        }
-        if rec.get("budget_scaled"):
-            item["original_recommendation"] = rec.get("original_recommendation", 0)
-        output["recommendations"].append(item)
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(output, f, ensure_ascii=False, indent=2)
-
-    print(f"  ▸ JSON 저장 완료: {os.path.basename(output_path)}")
-
-
-# ═══════════════════════════════════════════════════════════════
-# 예산 천장(Budget Ceiling) 자동 스케일링
-# ═══════════════════════════════════════════════════════════════
-
-BUDGET_CONFIG_FILE = os.path.join(OUTPUT_DIR, "budget_config.json")
-
-
-def apply_budget_ceiling(results: List[dict]) -> List[dict]:
-    """
-    budget_config.json이 존재하면, 카테고리별 추천 발주량 합계가
-    예산 천장을 초과할 때 비례 축소합니다.
-
-    - 천장 이하면 스케일링 없음
-    - budget_config.json이 없으면 제약 없이 기존 로직 유지
-    - 스케일링된 항목에 budget_scaled=True, original_recommendation 필드 추가
-    """
-    if not os.path.exists(BUDGET_CONFIG_FILE):
-        print("  ▸ budget_config.json 없음 → 예산 제약 없이 진행")
-        return results
-
-    with open(BUDGET_CONFIG_FILE, "r", encoding="utf-8") as f:
-        config = json.load(f)
-
-    # 카테고리별 예산 천장 매핑
-    ceiling_map = {}
-    for cat in config.get("category_budgets", []):
-        ceiling_map[cat["class2"]] = cat["budget_qty"]
-
-    if not ceiling_map:
-        print("  ▸ budget_config.json에 카테고리 예산 없음 → 스킵")
-        return results
-
-    print(f"  ▸ 예산 천장 적용 중 (총 {config.get('total_budget', 0):,}장)")
-
-    # 카테고리별 추천 발주량 합산
-    cat_totals = {}
-    for rec in results:
-        class2 = rec.get("NEW_CLASS2", "")
-        qty = rec.get("추천발주량", 0)
-        if class2 and qty > 0:
-            cat_totals[class2] = cat_totals.get(class2, 0) + qty
-
-    # 카테고리별 스케일링 비율 계산
-    scale_ratios = {}
-    for class2, total_qty in cat_totals.items():
-        ceiling = ceiling_map.get(class2)
-        if ceiling is not None and total_qty > ceiling and total_qty > 0:
-            scale_ratios[class2] = ceiling / total_qty
-            print(f"    - {class2}: {total_qty:,} → {ceiling:,} (스케일 {scale_ratios[class2]:.2f})")
-        else:
-            if ceiling is not None:
-                print(f"    - {class2}: {total_qty:,} ≤ {ceiling:,} (스케일링 불필요)")
-
-    # 스케일링 적용
-    scaled_count = 0
-    for rec in results:
-        class2 = rec.get("NEW_CLASS2", "")
-        ratio = scale_ratios.get(class2)
-        if ratio is not None and rec.get("추천발주량", 0) > 0:
-            original = rec["추천발주량"]
-            rec["original_recommendation"] = original
-            rec["추천발주량"] = ceil_10(original * ratio)
-            rec["budget_scaled"] = True
-            scaled_count += 1
-        else:
-            rec["budget_scaled"] = False
-
-    if scaled_count > 0:
-        print(f"    - 스케일링된 스타일: {scaled_count}건")
-    else:
-        print("    - 모든 카테고리가 예산 이내 (스케일링 불필요)")
-
-    return results
+    return output
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -501,7 +286,7 @@ def apply_budget_ceiling(results: List[dict]) -> List[dict]:
 # ═══════════════════════════════════════════════════════════════
 
 def main():
-    print("\n◆ STEP 4: 유사스타일 맵핑 → 26S 발주 제안\n")
+    print("\n◆ STEP 5: 유사스타일 맵핑 데이터 생성 (프론트엔드용)\n")
 
     # 1. ML 맵핑 파일 탐색
     mapping_file = None
@@ -513,13 +298,13 @@ def main():
 
     if mapping_file is None:
         print("  ⚠ 맵핑 파일이 없습니다 (data/similarity_mapping.csv)")
-        print("    → STEP 4를 건너뜁니다. 나머지 분석은 정상 완료되었습니다.")
+        print("    → STEP 5를 건너뜁니다. 나머지 분석은 정상 완료되었습니다.")
         return
 
     # 2. STEP2/3 분석 결과 확인
     if not os.path.exists(ANALYSIS_RESULT_FILE):
         print(f"  ✗ STEP2/3 분석 결과 파일이 없습니다: {os.path.basename(ANALYSIS_RESULT_FILE)}")
-        print("    → STEP 1~3을 먼저 실행해주세요.")
+        print("    → STEP 1~4를 먼저 실행해주세요.")
         sys.exit(1)
 
     # 3. 맵핑 로드
@@ -531,30 +316,22 @@ def main():
     # 4. STEP2/3 분석 결과 로드 & 스타일 집계
     style_summary = load_analysis_result()
 
-    # 5. 추천 발주량 산출
-    print("  ▸ 추천 발주량 산출 중...")
-    results = process_recommendations(mapping_df, style_summary)
+    # 5. 맵핑 JSON 생성
+    print("  ▸ 맵핑 데이터 생성 중...")
+    output = generate_style_mapping_json(mapping_df, style_summary)
 
-    # 5.5 예산 천장 적용 (budget_config.json이 있는 경우)
-    results = apply_budget_ceiling(results)
-
-    # 6. 출력 저장
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    save_excel(results, OUTPUT_EXCEL)
-    save_json(results, OUTPUT_JSON)
+    # 6. JSON 저장
+    os.makedirs(PUBLIC_DIR, exist_ok=True)
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
+    print(f"  ▸ JSON 저장 완료: {os.path.basename(OUTPUT_JSON)}")
 
     # 7. 요약 출력
-    total = len(results)
-    by_conf = {}
-    for r in results:
-        by_conf[r["confidence"]] = by_conf.get(r["confidence"], 0) + 1
-
+    meta = output["metadata"]
     print(f"\n  ◆ 결과 요약:")
-    print(f"    - 전체 스타일: {total}")
-    for conf in ["high", "medium", "low", "none"]:
-        cnt = by_conf.get(conf, 0)
-        if cnt > 0:
-            print(f"    - {conf}: {cnt}건")
+    print(f"    - 전체 스타일: {meta['total_styles']}")
+    print(f"    - 매칭 성공: {meta['matched_styles']}")
+    print(f"    - 매칭 불가: {meta['unmatched_styles']}")
 
 
 if __name__ == "__main__":

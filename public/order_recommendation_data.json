@@ -1,0 +1,375 @@
+{
+  "metadata": {
+    "season": "26S",
+    "confirmed_at": "2026-02-20T08:34:47Z",
+    "total_styles": 12,
+    "matched_styles": 12,
+    "total_recommendation_qty": 10750,
+    "scaled_count": 0,
+    "category_budgets": [
+      {
+        "class2": "Inner",
+        "budget_qty": 719860,
+        "recommended_qty": 0,
+        "pre_scale_qty": 0
+      },
+      {
+        "class2": "Wear_etc",
+        "budget_qty": 9160,
+        "recommended_qty": 0,
+        "pre_scale_qty": 0
+      },
+      {
+        "class2": "Outer",
+        "budget_qty": 124210,
+        "recommended_qty": 0,
+        "pre_scale_qty": 0
+      },
+      {
+        "class2": "Bottom",
+        "budget_qty": 260060,
+        "recommended_qty": 0,
+        "pre_scale_qty": 0
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "new_part_cd": "DKRL11051_26S",
+      "new_item_nm": "긴팔티셔츠",
+      "new_class2": "니트",
+      "추천발주량": 1500,
+      "budget_scaled": false,
+      "ref_part_cd": "DKRL11051",
+      "ref_score": 0.95,
+      "ref_총판매": 936,
+      "ref_총입고": 1279,
+      "ref_판매율": 73.2,
+      "ref_진단": "🚨Early Shortage (5월전 품절)",
+      "ref_AI발주량": 1500,
+      "판매가": 39000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 24.7,
+          "qty": 370
+        },
+        {
+          "color_cd": "MGL",
+          "ratio": 49.3,
+          "qty": 740
+        },
+        {
+          "color_cd": "WHS",
+          "ratio": 26.0,
+          "qty": 390
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DMRL25051_26S",
+      "new_item_nm": "긴팔티셔츠",
+      "new_class2": "니트",
+      "추천발주량": 1020,
+      "budget_scaled": false,
+      "ref_part_cd": "DMRL25051",
+      "ref_score": 0.88,
+      "ref_총판매": 762,
+      "ref_총입고": 1861,
+      "ref_판매율": 40.9,
+      "ref_진단": "🔴Risk (부진)",
+      "ref_AI발주량": 1020,
+      "판매가": 59000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 56.9,
+          "qty": 580
+        },
+        {
+          "color_cd": "MTS",
+          "ratio": 43.1,
+          "qty": 440
+        },
+        {
+          "color_cd": "OLL",
+          "ratio": 0.0,
+          "qty": 0
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DWRL22051_26S",
+      "new_item_nm": "긴팔티셔츠",
+      "new_class2": "니트",
+      "추천발주량": 1880,
+      "budget_scaled": false,
+      "ref_part_cd": "DWRL22051",
+      "ref_score": 0.91,
+      "ref_총판매": 1402,
+      "ref_총입고": 2097,
+      "ref_판매율": 66.9,
+      "ref_진단": "🟢Hit (적기 소진)",
+      "ref_AI발주량": 1880,
+      "판매가": 49000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 38.3,
+          "qty": 720
+        },
+        {
+          "color_cd": "DGS",
+          "ratio": 28.7,
+          "qty": 540
+        },
+        {
+          "color_cd": "WHS",
+          "ratio": 33.0,
+          "qty": 620
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DWLG41051_26S",
+      "new_item_nm": "레깅스",
+      "new_class2": "이지웨어",
+      "추천발주량": 380,
+      "budget_scaled": false,
+      "ref_part_cd": "DWLG41051",
+      "ref_score": 0.93,
+      "ref_총판매": 281,
+      "ref_총입고": 1500,
+      "ref_판매율": 18.7,
+      "ref_진단": "🔴Risk (부진)",
+      "ref_AI발주량": 380,
+      "판매가": 59000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 71.1,
+          "qty": 270
+        },
+        {
+          "color_cd": "GRD",
+          "ratio": 28.9,
+          "qty": 110
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DWLG44051_26S",
+      "new_item_nm": "레깅스",
+      "new_class2": "이지웨어",
+      "추천발주량": 60,
+      "budget_scaled": false,
+      "ref_part_cd": "DWLG44051",
+      "ref_score": 0.87,
+      "ref_총판매": 38,
+      "ref_총입고": 1474,
+      "ref_판매율": 2.6,
+      "ref_진단": "🔴Risk (부진)",
+      "ref_AI발주량": 60,
+      "판매가": 89000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 66.7,
+          "qty": 40
+        },
+        {
+          "color_cd": "BRS",
+          "ratio": 33.3,
+          "qty": 20
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DKPT31051_26S",
+      "new_item_nm": "팬츠",
+      "new_class2": "팬츠",
+      "추천발주량": 380,
+      "budget_scaled": false,
+      "ref_part_cd": "DKPT31051",
+      "ref_score": 0.9,
+      "ref_총판매": 281,
+      "ref_총입고": 1343,
+      "ref_판매율": 20.9,
+      "ref_진단": "🔴Risk (부진)",
+      "ref_AI발주량": 380,
+      "판매가": 69000,
+      "colors": [
+        {
+          "color_cd": "BGL",
+          "ratio": 28.9,
+          "qty": 110
+        },
+        {
+          "color_cd": "BKS",
+          "ratio": 71.1,
+          "qty": 270
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DKOP71053_26S",
+      "new_item_nm": "원피스",
+      "new_class2": "원피스",
+      "추천발주량": 290,
+      "budget_scaled": false,
+      "ref_part_cd": "DKOP71053",
+      "ref_score": 0.89,
+      "ref_총판매": 211,
+      "ref_총입고": 1050,
+      "ref_판매율": 20.1,
+      "ref_진단": "🔴Risk (부진)",
+      "ref_AI발주량": 290,
+      "판매가": 99000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 48.3,
+          "qty": 140
+        },
+        {
+          "color_cd": "GRL",
+          "ratio": 51.7,
+          "qty": 150
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DKAZ71053_26S",
+      "new_item_nm": "상하의 세트",
+      "new_class2": "세트",
+      "추천발주량": 1620,
+      "budget_scaled": false,
+      "ref_part_cd": "DKAZ71053",
+      "ref_score": 0.86,
+      "ref_총판매": 1213,
+      "ref_총입고": 2426,
+      "ref_판매율": 50.0,
+      "ref_진단": "🔴Risk (부진)",
+      "ref_AI발주량": 1620,
+      "판매가": 89000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 32.1,
+          "qty": 520
+        },
+        {
+          "color_cd": "LDS",
+          "ratio": 23.5,
+          "qty": 380
+        },
+        {
+          "color_cd": "MGL",
+          "ratio": 44.4,
+          "qty": 720
+        }
+      ]
+    },
+    {
+      "new_part_cd": "DKPD11051_26S",
+      "new_item_nm": "패딩",
+      "new_class2": "아우터",
+      "추천발주량": 450,
+      "budget_scaled": false,
+      "ref_part_cd": "DKPD11051",
+      "ref_score": 0.92,
+      "ref_총판매": 328,
+      "ref_총입고": 1099,
+      "ref_판매율": 29.8,
+      "ref_진단": "🔴Risk (부진)",
+      "ref_AI발주량": 450,
+      "판매가": 149000,
+      "colors": [
+        {
+          "color_cd": "BGL",
+          "ratio": 26.7,
+          "qty": 120
+        },
+        {
+          "color_cd": "BKS",
+          "ratio": 73.3,
+          "qty": 330
+        }
+      ]
+    },
+    {
+      "new_part_cd": "NEW_STYLE_001",
+      "new_item_nm": "신규자켓",
+      "new_class2": "자켓",
+      "추천발주량": 500,
+      "budget_scaled": false,
+      "manual_input": true,
+      "colors": [
+        {
+          "color_cd": "-",
+          "ratio": 100.0,
+          "qty": 500
+        }
+      ]
+    },
+    {
+      "new_part_cd": "NEW_STYLE_002",
+      "new_item_nm": "신규스커트",
+      "new_class2": "스커트",
+      "추천발주량": 1500,
+      "budget_scaled": false,
+      "ref_part_cd": "DKRL11051",
+      "ref_score": 0.55,
+      "ref_총판매": 936,
+      "ref_총입고": 1279,
+      "ref_판매율": 73.2,
+      "ref_진단": "🚨Early Shortage (5월전 품절)",
+      "ref_AI발주량": 1500,
+      "판매가": 39000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 24.7,
+          "qty": 370
+        },
+        {
+          "color_cd": "MGL",
+          "ratio": 49.3,
+          "qty": 740
+        },
+        {
+          "color_cd": "WHS",
+          "ratio": 26.0,
+          "qty": 390
+        }
+      ]
+    },
+    {
+      "new_part_cd": "NEW_STYLE_003",
+      "new_item_nm": "신규블라우스",
+      "new_class2": "블라우스",
+      "추천발주량": 1170,
+      "budget_scaled": false,
+      "ref_part_cd": "DMRL61053",
+      "ref_score": 0.72,
+      "ref_총판매": 869,
+      "ref_총입고": 1413,
+      "ref_판매율": 61.5,
+      "ref_진단": "⚪Normal",
+      "ref_AI발주량": 1170,
+      "판매가": 49000,
+      "colors": [
+        {
+          "color_cd": "BKS",
+          "ratio": 66.7,
+          "qty": 780
+        },
+        {
+          "color_cd": "WHS",
+          "ratio": 33.3,
+          "qty": 390
+        }
+      ]
+    }
+  ]
+}

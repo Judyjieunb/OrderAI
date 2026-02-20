@@ -1,5 +1,10 @@
 import pandas as pd
 import json
+from config_loader import get_sell_through_threshold, get_early_stockout_date, get_shortage_cutoff_date
+
+_ST_THRESHOLD = get_sell_through_threshold()
+_EARLY_STOCKOUT_DATE = get_early_stockout_date()
+_SHORTAGE_CUTOFF_DATE = get_shortage_cutoff_date()
 
 # 1. 데이터 로드 (파일명에 맞게 수정)
 file_path = '../data/weekly_dx25s.xlsx - Data.csv'
@@ -42,7 +47,7 @@ def generate_chart_data(group, init_date):
         if row['STOR_QTY_KR'] > 0 and pd.notnull(init_date) and row['END_DT'] > init_date:
             reorder_count += 1
             label = f'{reorder_count}차 리오더' if reorder_count > 0 else '리오더'
-        elif row.get('Sell_Through', 0) >= 0.7 and label == '':
+        elif row.get('Sell_Through', 0) >= _ST_THRESHOLD and label == '':
             label = '재고부족'
             
         chart_data.append({
@@ -85,7 +90,7 @@ def analyze_style_pattern(group, is_total=False):
     
     # 3. 결품 임박 시점 (누적 판매율 70% 최초 돌파 주차)
     # 단, 입고가 10장 이상인 유의미한 경우만 체크
-    stock_out_row = group[(group['Sell_Through'] >= 0.7) & (group['Cum_In'] > 10)]
+    stock_out_row = group[(group['Sell_Through'] >= _ST_THRESHOLD) & (group['Cum_In'] > 10)]
     stock_out_date = stock_out_row['END_DT'].min() if not stock_out_row.empty else pd.NaT
     
     # [C] AI 진단 (Diagnosis)
@@ -96,9 +101,9 @@ def analyze_style_pattern(group, is_total=False):
     
     status = "⚪Normal"
     if pd.notnull(stock_out_date):
-        if stock_out_date <= pd.Timestamp('2025-05-30'):
+        if stock_out_date <= _EARLY_STOCKOUT_DATE:
             status = "🚨Early Shortage (5월전 품절)"
-        elif stock_out_date <= pd.Timestamp('2025-07-30'):
+        elif stock_out_date <= _SHORTAGE_CUTOFF_DATE:
             status = "⚠️Shortage (시즌중 품절)"
         else:
             status = "🟢Hit (적기 소진)"

@@ -4,6 +4,7 @@ import json
 import os
 import math
 from datetime import datetime, timedelta
+from config_loader import get_season_end_date, get_sell_through_threshold
 
 # ============================================
 # 0. 설정 및 상수
@@ -12,9 +13,9 @@ ANALYSIS_RESULT_FILE = '../output/25S_TimeSeries_Analysis_Result.xlsx'  # 시계
 ORIGINAL_DATA_FILE = '../data/weekly_dx25s.xlsx'  # 원본 시계열 데이터 파일명
 TARGET_FILE = '../output/25S_TimeSeries_Analysis_Result.xlsx'  # 결과 엑셀 파일명 (같은 파일에 추가)
 JSON_FILE = '../public/dashboard_data.json'  # 대시보드 데이터 파일명
-SEASON_END_DATE = pd.Timestamp('2025-09-30')  # 시즌 종료일
+SEASON_END_DATE = get_season_end_date()  # 시즌 종료일
 TARGET_END_SALES = 5  # 시즌 종료 시점 목표 판매량 (수렴값, 기초체력 기준으로도 사용)
-SELL_THROUGH_THRESHOLD = 0.7  # 상업적 결품 판매율 기준 (70%)
+SELL_THROUGH_THRESHOLD = get_sell_through_threshold()  # 상업적 결품 판매율 기준
 
 print("=" * 60)
 print("Step 3: AI 수요 예측 및 기회비용 분석 (Opportunity Loss Analysis) v2")

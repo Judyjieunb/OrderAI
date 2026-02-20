@@ -55,3 +55,4 @@ output/
 # Generated JSON (스크립트가 생성)
 public/dashboard_data.json
 public/season_closing_data.json
+.vercel

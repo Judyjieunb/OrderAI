@@ -1,0 +1,138 @@
+{
+  "salesData": [
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 230,
+      "SALE_QTY_CNS": 294
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 235,
+      "SALE_QTY_CNS": 283
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 240,
+      "SALE_QTY_CNS": 722
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 245,
+      "SALE_QTY_CNS": 424
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 250,
+      "SALE_QTY_CNS": 782
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 255,
+      "SALE_QTY_CNS": 335
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 260,
+      "SALE_QTY_CNS": 1129
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 265,
+      "SALE_QTY_CNS": 968
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 270,
+      "SALE_QTY_CNS": 1194
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 275,
+      "SALE_QTY_CNS": 234
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "Black",
+      "SIZE_CD": 280,
+      "SALE_QTY_CNS": 551
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "White",
+      "SIZE_CD": 230,
+      "SALE_QTY_CNS": 410
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "White",
+      "SIZE_CD": 235,
+      "SALE_QTY_CNS": 516
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "White",
+      "SIZE_CD": 240,
+      "SALE_QTY_CNS": 890
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "White",
+      "SIZE_CD": 245,
+      "SALE_QTY_CNS": 682
+    },
+    {
+      "CAT": "신발",
+      "SUB_CAT": "운동화",
+      "ColorRange": "White",
+      "SIZE_CD": 250,
+      "SALE_QTY_CNS": 700
+    }
+  ],
+  "mappingData": [
+    {
+      "컬러코드": "BKS",
+      "컬러명": "블랙",
+      "ColorRange": "Black"
+    },
+    {
+      "컬러코드": "BKD",
+      "컬러명": "제트블랙",
+      "ColorRange": "Black"
+    },
+    {
+      "컬러코드": "WHM",
+      "컬러명": "화이트 멜란지",
+      "ColorRange": "White"
+    },
+    {
+      "컬러코드": "WHN",
+      "컬러명": "네온 화이트",
+      "ColorRange": "White"
+    }
+  ]
+}

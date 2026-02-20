@@ -82,12 +82,36 @@ const SAMPLE_MAPPING_DATA = [
 ];
 
 function SizeAssortmentExample() {
+  const [salesData, setSalesData] = useState(SAMPLE_SALES_DATA);
+  const [mappingData, setMappingData] = useState(SAMPLE_MAPPING_DATA);
+  const [dataSource, setDataSource] = useState('sample');
+
+  useEffect(() => {
+    fetch('/size_assortment_data.json')
+      .then(res => {
+        if (!res.ok) throw new Error('not found');
+        return res.json();
+      })
+      .then(data => {
+        if (data.salesData && data.salesData.length > 0) {
+          setSalesData(data.salesData);
+          setDataSource('json');
+        }
+        if (data.mappingData && data.mappingData.length > 0) {
+          setMappingData(data.mappingData);
+        }
+      })
+      .catch(() => {
+        // JSON 로드 실패 시 기존 샘플 데이터 유지
+      });
+  }, []);
+
   return (
     <SizeAssortment
-      salesData={SAMPLE_SALES_DATA}
-      mappingData={SAMPLE_MAPPING_DATA}
-      title="사이즈 배분율 분석 (예시)"
-      subtitle="샘플 데이터를 사용한 데모입니다."
+      salesData={salesData}
+      mappingData={mappingData}
+      title="사이즈 배분율 분석"
+      subtitle={dataSource === 'json' ? '파이프라인 데이터 사용 중' : '샘플 데이터 사용 중 (파이프라인 실행 후 업데이트)'}
     />
   );
 }
